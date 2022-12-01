@@ -1,25 +1,25 @@
 import React from "react";
 import { FaSignInAlt, FaUser } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 const Header = () => {
   return (
     <header className="header">
       <div className="logo">
-        <Link to="/">Support Desk</Link>
+        <NavLink to="/">Support Desk</NavLink>
       </div>
       <ul>
         <li>
-          <Link to="/login">
+          <NavLink to="/login">
             <FaSignInAlt />
             Login
-          </Link>
+          </NavLink>
         </li>
         <li>
-          <Link to="/register">
+          <NavLink to="/register">
             <FaUser />
             Register
-          </Link>
+          </NavLink>
         </li>
       </ul>
     </header>

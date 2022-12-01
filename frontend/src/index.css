@@ -67,7 +67,8 @@ h3 {
   align-items: center;
 }
 
-.header ul li a:hover {
+.header ul li a:hover,
+.header ul li a.active {
   color: #777;
 }
 
