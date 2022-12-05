@@ -1,9 +1,10 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaSignInAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
+import { login, reset } from "../features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-// import { login } from "../features/auth/authSlice";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -11,12 +12,29 @@ const Login = () => {
     password: "",
   });
 
+  const navigate = useNavigate();
+
   const { email, password } = formData;
 
   const dispatch = useDispatch();
-  // const { user, isError, isSuccess, isLoading, message } = useSelector(
-  //   (state) => state.auth
-  // );
+
+  // useSelector allow us to get state data which is defined
+  // in the reducer property of the store object (See store.js)
+  const { user, isError, isSuccess, isLoading, message } = useSelector(
+    (state) => state.auth
+  );
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+
+    if (isSuccess && user) {
+      navigate("/");
+    }
+
+    dispatch(reset());
+  }, [user, isError, isSuccess, message, dispatch, navigate]);
 
   const onChange = (e) => {
     setFormData((prevState) => ({
@@ -32,7 +50,7 @@ const Login = () => {
       password,
     };
 
-    // dispatch(login(userData));
+    dispatch(login(userData));
   };
 
   return (
@@ -70,8 +88,12 @@ const Login = () => {
             />
           </div>
           <div className="form-group">
-            <button type="submit" className="btn btn-block">
-              Submit
+            <button
+              type="submit"
+              className="btn btn-block"
+              disabled={isLoading}
+            >
+              {isLoading ? "Checking credentials..." : "Submit"}
             </button>
           </div>
         </form>

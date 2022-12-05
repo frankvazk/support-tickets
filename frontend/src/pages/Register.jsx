@@ -1,11 +1,13 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaUser } from "react-icons/fa";
 import { toast } from "react-toastify";
-// import { useSelector, useDispatch } from "react-redux";
-// import { register } from "../features/auth/authSlice";
+import { useSelector, useDispatch } from "react-redux";
+import { register, reset } from "../features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -14,11 +16,26 @@ const Register = () => {
   });
 
   const { name, email, password, confirmPassword } = formData;
-  // const dispatch = useDispatch();
+  // Use distpach allow us to execute functions defined in the Slide Files
+  const dispatch = useDispatch();
 
-  // const { user, isError, isSuccess, isLoading, message } = useSelector(
-  //   (state) => state.auth
-  // );
+  // useSelector allow us to get state data which is defined
+  // in the reducer property of the store object (See store.js)
+  const { user, isError, isSuccess, isLoading, message } = useSelector(
+    (state) => state.auth
+  );
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+
+    if (isSuccess && user) {
+      navigate("/");
+    }
+
+    dispatch(reset());
+  }, [user, isError, isSuccess, message, dispatch, navigate]);
 
   const onChange = (e) => {
     setFormData((prevState) => ({
@@ -40,7 +57,7 @@ const Register = () => {
       password,
     };
 
-    // dispatch(register(userData));
+    dispatch(register(userData));
   };
 
   return (
@@ -103,7 +120,7 @@ const Register = () => {
           </div>
           <div className="form-group">
             <button type="submit" className="btn btn-block">
-              Submit
+              {isLoading ? "Creating account..." : "Submit"}
             </button>
           </div>
         </form>
