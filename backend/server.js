@@ -20,6 +20,7 @@ app.get("/", (req, res) =>
   res.status(201).json({ message: "Hello from JSON Response" })
 );
 app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/tickets", require("./routes/ticketRoutes"));
 
 // Error Handler Middleware must be implemented after all Routes
 app.use(errorHandler);
