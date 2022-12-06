@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import NewTicket from "./pages/NewTicket";
 import Protect from "./components/Protect";
 import Tickets from "./pages/Tickets";
+import Ticket from "./pages/Ticket";
 
 function App() {
   return (
@@ -32,6 +33,14 @@ function App() {
               element={
                 <Protect>
                   <Tickets />
+                </Protect>
+              }
+            />
+            <Route
+              path="/ticket/:id"
+              element={
+                <Protect>
+                  <Ticket />
                 </Protect>
               }
             />
