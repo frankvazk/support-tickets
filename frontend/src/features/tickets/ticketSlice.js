@@ -1,9 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import ticketService from "./ticketService";
 
-// Get user from localstorage
-const user = JSON.parse(localStorage.getItem("user"));
-
 const initialState = {
   tickets: [],
   ticket: null,
@@ -12,6 +9,27 @@ const initialState = {
   isLoading: false,
   message: "",
 };
+
+export const createTicket = createAsyncThunk(
+  "ticket/create",
+  async (ticket, thunkAPI) => {
+    try {
+      //Get Token from Auth State
+      const token = thunkAPI.getState().auth.user.token;
+      // Enviamos el error al extra reducer fulfilled
+      return await ticketService.create(ticket, token);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      // Enviamos el error al extra reducer fulfilled
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
 
 export const ticketSlice = createSlice({
   name: "ticket",
@@ -24,7 +42,26 @@ export const ticketSlice = createSlice({
       state.message = "";
     },
   },
-  extraReducers: (builder) => {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(createTicket.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(createTicket.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(createTicket.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.isError = false;
+        state.message = "";
+        state.ticket = {};
+        state.tickets = [action.payload, ...state.tickets];
+      });
+  },
 });
 
 export const { reset } = ticketSlice.actions;

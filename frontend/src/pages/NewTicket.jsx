@@ -1,9 +1,19 @@
 import React from "react";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { reset, createTicket } from "../features/tickets/ticketSlice";
+import { useEffect } from "react";
+import BackButton from "../components/BackButton";
 
 const NewTicket = () => {
   const { user } = useSelector((state) => state.auth);
+  const { isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.ticket
+  );
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: user.name,
     email: user.email,
@@ -12,6 +22,20 @@ const NewTicket = () => {
   });
 
   const { name, email, product, description } = formData;
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+
+    if (isSuccess) {
+      dispatch(reset());
+      navigate("/tickets");
+    }
+
+    dispatch(reset());
+  }, [dispatch, isError, isSuccess, navigate, message]);
+
   const handleFormChange = (e) => {
     setFormData((prevState) => ({
       ...prevState,
@@ -21,10 +45,12 @@ const NewTicket = () => {
 
   const onSubmit = (e) => {
     e.preventDefault();
+    dispatch(createTicket(formData));
   };
 
   return (
     <>
+      <BackButton url="/" />
       <section className="heading">
         <h1>Create New Ticket</h1>
         <p>Please fill out the form below</p>
@@ -53,7 +79,12 @@ const NewTicket = () => {
         <form onSubmit={onSubmit}>
           <div className="form-group">
             <label htmlFor="product">Product</label>
-            <select name="product" id="product" onChange={handleFormChange}>
+            <select
+              name="product"
+              id="product"
+              value={product}
+              onChange={handleFormChange}
+            >
               <option value="iPhone">iPhone</option>
               <option value="MacBook Pro">MacBook Pro</option>
               <option value="iMac">iMac</option>
@@ -72,7 +103,9 @@ const NewTicket = () => {
             ></textarea>
           </div>
           <div className="form-group">
-            <button className="btn btn-block">Submit</button>
+            <button className="btn btn-block" disabled={isLoading}>
+              {isLoading ? "Creating Ticket..." : "Submit"}
+            </button>
           </div>
         </form>
       </section>
