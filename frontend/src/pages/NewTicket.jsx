@@ -24,6 +24,7 @@ const NewTicket = () => {
   const { name, email, product, description } = formData;
 
   useEffect(() => {
+    console.log(isSuccess);
     if (isError) {
       toast.error(message);
     }
