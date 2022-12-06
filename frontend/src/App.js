@@ -5,6 +5,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import NewTicket from "./pages/NewTicket";
+import Protect from "./components/Protect";
 
 function App() {
   return (
@@ -16,6 +18,14 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route
+              path="/new-ticket"
+              element={
+                <Protect>
+                  <NewTicket />
+                </Protect>
+              }
+            />
           </Routes>
         </div>
       </BrowserRouter>
