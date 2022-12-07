@@ -1,12 +1,16 @@
 import axios from "axios";
 const API_URL = "/api/tickets";
 
-const createNote = async (ticketId, note, token) => {
-  const response = await axios.post(`${API_URL}/${ticketId}/notes`, note, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+const createNote = async (ticketId, text, token) => {
+  const response = await axios.post(
+    `${API_URL}/${ticketId}/notes`,
+    { text },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
   return response.data;
 };

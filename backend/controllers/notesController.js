@@ -21,7 +21,9 @@ const getNotes = asyncHandler(async (req, res) => {
     throw new Error("User not authorized");
   }
 
-  const notes = await Note.find({ ticket: req.params.ticketId });
+  const notes = await Note.find({ ticket: req.params.ticketId }).sort({
+    createdAt: "desc",
+  });
   res.status(200).json(notes);
 });
 

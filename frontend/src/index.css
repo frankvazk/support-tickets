@@ -131,6 +131,15 @@ h3 {
   font-family: inherit;
 }
 
+.form-group .error {
+  border: 1px solid red;
+}
+
+span.error {
+  color: red;
+  border: none !important;
+}
+
 .form-group label {
   text-align: left;
   display: block;

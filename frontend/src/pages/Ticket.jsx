@@ -5,7 +5,11 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Modal from "react-modal";
 import { getTicket, updateTicket } from "../features/tickets/ticketSlice";
-import { getNotes } from "../features/notes/noteSlice";
+import {
+  getNotes,
+  createNote,
+  reset as resetNotes,
+} from "../features/notes/noteSlice";
 import BackButton from "../components/BackButton";
 import NoteItem from "../components/NoteItem";
 import { FaPlus } from "react-icons/fa";
@@ -27,14 +31,18 @@ const customStyles = {
 Modal.setAppElement("#root");
 
 const Ticket = () => {
+  const [noteError, setNoteError] = useState(false);
   const [modal, setModal] = useState(false);
   const [noteText, setNoteText] = useState("");
 
   const { ticket, isSuccess, message, isError, isLoading, isSaving } =
     useSelector((state) => state.ticket);
-  const { notes, isLoading: notesIsLoading } = useSelector(
-    (state) => state.notes
-  );
+  const {
+    notes,
+    isLoading: notesIsLoading,
+    isSaving: isNoteSaving,
+    isSuccess: isNoteSuccess,
+  } = useSelector((state) => state.notes);
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -52,12 +60,34 @@ const Ticket = () => {
 
   const openModal = () => setModal(true);
 
-  const closeModal = () => setModal(false);
+  const closeModal = () => {
+    setModal(false);
+    setNoteError(false);
+    setNoteText("");
+  };
 
   const onSubmit = (e) => {
     e.preventDefault();
-    closeModal();
+    setNoteError(false);
+    if (noteText === "") {
+      setNoteError(true);
+      return;
+    }
+
+    const data = {
+      ticketId: ticket._id,
+      text: noteText,
+    };
+    dispatch(createNote(data));
   };
+
+  //Notes State Subscriptions
+  useEffect(() => {
+    if (isNoteSuccess && !isNoteSaving) {
+      closeModal();
+      dispatch(resetNotes());
+    }
+  }, [isNoteSuccess, isNoteSaving, dispatch]);
 
   useEffect(() => {
     if (isSuccess && !isSaving) {
@@ -128,15 +158,18 @@ const Ticket = () => {
                   <textarea
                     name="noteText"
                     id="noteText"
-                    className="form-control"
+                    className={`form-control ${noteError ? "error" : ""}`}
                     placeholder="Note text"
                     value={noteText}
                     onChange={(e) => setNoteText(e.target.value)}
                   ></textarea>
+                  {noteError && (
+                    <span className="error">Please, fill out the form.</span>
+                  )}
                 </div>
                 <div className="form-group">
-                  <button className="btn" type="submit">
-                    Submit
+                  <button className="btn" type="submit" disabled={isNoteSaving}>
+                    {isNoteSaving ? "Creating note..." : "Submit"}
                   </button>
                 </div>
               </form>
