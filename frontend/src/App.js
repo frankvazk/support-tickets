@@ -13,7 +13,7 @@ import Ticket from "./pages/Ticket";
 function App() {
   return (
     <>
-      <BrowserRouter>
+      <BrowserRouter basename="/">
         <div className="container">
           <Header />
           <Routes>

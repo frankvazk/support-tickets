@@ -1,3 +1,4 @@
+const path = require("path");
 const express = require("express");
 const colors = require("colors");
 const dotenv = require("dotenv").config();
@@ -14,6 +15,14 @@ app.use(express.urlencoded({ extended: false }));
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });
+
+// Static Files Route
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend", "build")));
+  app.get("/*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "build", "index.html"));
+  });
+}
 
 // Routes
 app.get("/", (req, res) =>
