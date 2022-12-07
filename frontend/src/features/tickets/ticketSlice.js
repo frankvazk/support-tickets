@@ -7,6 +7,7 @@ const initialState = {
   isError: false,
   isSuccess: false,
   isLoading: false,
+  isSaving: false,
   message: "",
 };
 
@@ -18,6 +19,27 @@ export const createTicket = createAsyncThunk(
       const token = thunkAPI.getState().auth.user.token;
       // Enviamos el error al extra reducer fulfilled
       return await ticketService.create(ticket, token);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      // Enviamos el error al extra reducer fulfilled
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+export const updateTicket = createAsyncThunk(
+  "ticket/update",
+  async (ticket, thunkAPI) => {
+    try {
+      //Get Token from Auth State
+      const token = thunkAPI.getState().auth.user.token;
+      // Enviamos el error al extra reducer fulfilled
+      return await ticketService.updateTicket(ticket._id, ticket, token);
     } catch (error) {
       const message =
         (error.response &&
@@ -82,6 +104,7 @@ export const ticketSlice = createSlice({
       state.isError = false;
       state.isSuccess = false;
       state.message = "";
+      state.isSaving = false;
     },
   },
   extraReducers: (builder) => {
@@ -108,7 +131,6 @@ export const ticketSlice = createSlice({
       .addCase(getTickets.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isError = false;
-        state.isSuccess = true;
         state.message = "";
         state.tickets = action.payload;
       })
@@ -124,13 +146,31 @@ export const ticketSlice = createSlice({
       .addCase(getTicket.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isError = false;
-        state.isSuccess = true;
         state.message = "";
         state.ticket = action.payload;
       })
       .addCase(getTicket.rejected, (state, action) => {
         state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(updateTicket.pending, (state) => {
+        state.isSaving = true;
         state.isSuccess = false;
+      })
+      .addCase(updateTicket.fulfilled, (state, action) => {
+        state.isSaving = false;
+        state.isError = false;
+        state.isSuccess = true;
+        state.message = "";
+        state.tickets.map((ticket) =>
+          ticket._id === action.payload.id ? (ticket.status = "closed") : ticket
+        );
+      })
+      .addCase(updateTicket.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.isSaving = false;
         state.isError = true;
         state.message = action.payload;
       });

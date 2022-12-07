@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import TicketItem from "../components/TicketItem";
 
 const Tickets = () => {
-  const { tickets, isError, message, isLoading, isSuccess } = useSelector(
+  const { tickets, isError, message, isLoading } = useSelector(
     (state) => state.ticket
   );
   const dispatch = useDispatch();
@@ -21,23 +21,14 @@ const Tickets = () => {
   useEffect(() => {
     if (isError) {
       toast.error(message);
-      navigate("/"); //When this get executed, willUnmountComponent will be fired too
     }
-
-    // This function executes when
-    // willUnmountComponent gets fired
-    return () => {
-      console.log(isSuccess);
-      if (isSuccess) {
-        dispatch(reset());
-      }
-    };
-  }, [isError, isSuccess, message, dispatch, navigate]);
+  }, [isError, message]);
 
   const onClick = () => {
     dispatch(reset());
     navigate("/new-ticket");
   };
+
   return (
     <>
       <BackButton url="/" />

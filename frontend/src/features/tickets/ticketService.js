@@ -32,10 +32,21 @@ const getTicket = async (id, token) => {
   return response.data;
 };
 
+const updateTicket = async (id, ticket, token) => {
+  const response = await axios.put(`${API_URL}/${id}`, ticket, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+};
+
 const ticketService = {
   create,
   getTickets,
   getTicket,
+  updateTicket,
 };
 
 export default ticketService;
