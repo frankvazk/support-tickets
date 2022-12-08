@@ -16,20 +16,22 @@ app.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });
 
-// Static Files Route
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend", "build")));
-  app.get("/*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "build", "index.html"));
-  });
-}
-
 // Routes
-app.get("/", (req, res) =>
-  res.status(201).json({ message: "Hello from JSON Response" })
-);
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/tickets", require("./routes/ticketRoutes"));
 
+// Static Files Route
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/build")));
+  app.get("*", (req, res) => {
+    res.sendFile(
+      path.join(__dirname, "../", "frontend", "build", "index.html")
+    );
+  });
+} else {
+  app.get("/", (req, res) =>
+    res.status(201).json({ message: "Hello from JSON Response" })
+  );
+}
 // Error Handler Middleware must be implemented after all Routes
 app.use(errorHandler);
